@@ -1,0 +1,15 @@
+/Users/jaimeedouglas/Desktop/MIS221/Para/obj/Debug/net9.0/Para.GeneratedMSBuildEditorConfig.editorconfig
+/Users/jaimeedouglas/Desktop/MIS221/Para/obj/Debug/net9.0/Para.AssemblyInfoInputs.cache
+/Users/jaimeedouglas/Desktop/MIS221/Para/obj/Debug/net9.0/Para.AssemblyInfo.cs
+/Users/jaimeedouglas/Desktop/MIS221/Para/obj/Debug/net9.0/Para.csproj.CoreCompileInputs.cache
+/Users/jaimeedouglas/Desktop/MIS221/Para/bin/Debug/net9.0/Para
+/Users/jaimeedouglas/Desktop/MIS221/Para/bin/Debug/net9.0/Para.deps.json
+/Users/jaimeedouglas/Desktop/MIS221/Para/bin/Debug/net9.0/Para.runtimeconfig.json
+/Users/jaimeedouglas/Desktop/MIS221/Para/bin/Debug/net9.0/Para.dll
+/Users/jaimeedouglas/Desktop/MIS221/Para/bin/Debug/net9.0/Para.pdb
+/Users/jaimeedouglas/Desktop/MIS221/Para/obj/Debug/net9.0/Para.dll
+/Users/jaimeedouglas/Desktop/MIS221/Para/obj/Debug/net9.0/refint/Para.dll
+/Users/jaimeedouglas/Desktop/MIS221/Para/obj/Debug/net9.0/Para.pdb
+/Users/jaimeedouglas/Desktop/MIS221/Para/obj/Debug/net9.0/Para.genruntimeconfig.cache
+/Users/jaimeedouglas/Desktop/MIS221/Para/obj/Debug/net9.0/ref/Para.dll
+/Users/jaimeedouglas/Desktop/MIS221/Para/obj/Debug/net9.0/Para.sourcelink.json
