@@ -422,4 +422,11 @@ static void Goodbye(string name)
 {
     Console.Clear();
     Console.WriteLine($"Thanks for using the Budget Tracker, {name}! 💼");
+    string[] quotes = {
+    "“Don’t save what is left after spending, but spend what is left after saving.” – Warren Buffett",
+    "“A budget is telling your money where to go instead of wondering where it went.” – Dave Ramsey",
+    "“Money looks better in the bank than on your feet.” – Sophia Amoruso"
+    };
+    Console.WriteLine("💬 Money Tip: " + quotes[new Random().Next(quotes.Length)]);
+
 }
