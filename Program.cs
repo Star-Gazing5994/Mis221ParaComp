@@ -79,7 +79,7 @@ static void GetIncome(ref double amountPaid, ref string payPeriod, ref double to
     }
     income = amountPaid;
     Console.WriteLine("Income recorded.");
-    Thread.Sleep(2000);
+    Thread.Sleep(4000);
     GetPayPeriod(ref payPeriod, ref totalExpenses, ref labels, ref amounts, ref count, ref userName, ref income, ref loanAmount);
 
 }
@@ -96,17 +96,17 @@ static void GetPayPeriod(ref string payPeriod, ref double totalExpenses, ref str
         Console.WriteLine("Invalid entry. Defaulting to monthly.");
         payPeriod = "monthly";
     }
-    Thread.Sleep(2000);
-    TrackExpenses(ref totalExpenses, ref labels, ref amounts, ref count,  ref userName, ref income, ref loanAmount);
+    Thread.Sleep(4000);
+    TrackExpenses(ref totalExpenses, ref labels, ref amounts, ref count,  ref userName, ref income, ref loanAmount, ref payPeriod);
 }
 
 // TRACK EXPENSES
-static void TrackExpenses(ref double totalExpenses, ref string[] labels, ref double[] amounts, ref int count, ref string userName, ref double income, ref double loanAmount)
+static void TrackExpenses(ref double totalExpenses, ref string[] labels, ref double[] amounts, ref int count, ref string userName, ref double income, ref double loanAmount, ref string payPeriod)
 {
     string more = "y";
     while (more.ToLower() == "y" && count < labels.Length)
     {
-        Console.Write("Enter an expense label: ");
+        Console.Write("Enter an expense label (Ex: Rent, Utilities,etc.): ");
         labels[count] = Console.ReadLine();
 
         Console.Write("Enter amount for this expense: $");
@@ -114,39 +114,42 @@ static void TrackExpenses(ref double totalExpenses, ref string[] labels, ref dou
 
         count++;
 
+        Console.Clear();
         Console.Write("Add another expense? (y/n): ");
         more = Console.ReadLine();
     }
     
-    Thread.Sleep(2000);
-    ShowReport(ref labels, ref amounts, count, ref totalExpenses, ref userName, ref income, ref loanAmount);
+    Thread.Sleep(5000);
+    ShowReport(ref labels, ref amounts, count, ref totalExpenses, ref userName, ref income, ref loanAmount, ref payPeriod);
 
 }
 
 //********************* SHOW REPORT *********************//
-static void ShowReport(ref string[] labels, ref double[] amounts, int count, ref double totalExpenses, ref string userName, ref double income, ref double loanAmount)
+static void ShowReport(ref string[] labels, ref double[] amounts, int count, ref double totalExpenses, ref string userName, ref double income, ref double loanAmount, ref string payPeriod)
 {
     Console.Clear();
     totalExpenses = 0;
     Console.WriteLine($"🧾 Budget Summary for {userName}");
     Console.WriteLine("---------------------------------");
-    System.Console.WriteLine("What is your monthly income?");
     for (int i = 0; i < count; i++)
     {
     int bars = (int)(amounts[i] / 10);
     Console.Write($"{labels[i]}: ${amounts[i],6} ");
+    totalExpenses += amounts[i];
     Console.WriteLine(new string('█', bars));
     }
 
     Console.WriteLine("---------------------------------");
     Console.WriteLine($"Total Expenses: ${totalExpenses}");
     Console.WriteLine($"Remaining Balance: ${income - totalExpenses}");
-    Thread.Sleep(3000);
-    RerouteMenu(ref totalExpenses, ref income, ref loanAmount);
+    Thread.Sleep(5000);
+    Console.Clear();
+
+    OfferAdvice(ref totalExpenses, ref income, ref payPeriod, ref loanAmount, ref labels, ref amounts, ref count);
 }
 
 // *******************************OFFER ADVICE**************************//
-static void OfferAdvice(ref double totalExpenses, ref double income,ref string payPeriod, ref double loanAmount)
+static void OfferAdvice(ref double totalExpenses, ref double income, ref string payPeriod, ref double loanAmount, ref string[] labels,ref double[] amounts,ref int count)
 {
     Console.WriteLine("💡 Coaching Tips:");
     double ratio = totalExpenses / income;
@@ -173,14 +176,27 @@ static void OfferAdvice(ref double totalExpenses, ref double income,ref string p
     Console.WriteLine($"High-Yield Savings: Deposit ${income * 0.10} into a HYSA.");
     Console.WriteLine("Roth IRA: Contribute up to $500/month if possible.");
 
-    Thread.Sleep(2500);
-    RerouteMenu(ref totalExpenses, ref income, ref loanAmount);
+    System.Console.WriteLine("Would you like to save your budget or route to other options? Type : 'y' for Yes or 'n' for No");
+    string userInput = Console.ReadLine();
+    switch (userInput)
+    {
+        case "y":
+        SaveBudget(ref totalExpenses, ref loanAmount,ref labels,ref amounts,ref count,ref income, ref payPeriod);
+        break;
+        case "n":
+        Thread.Sleep(5000);
+        RerouteMenu(ref totalExpenses, ref income, ref loanAmount);
+        break;
+        default:
+        System.Console.WriteLine("Invalid entry, try again.");
+        break;
+    }
 }
 
 // ***************************SAVINGS PROJECTION**********************//
 static void SavingsProjection(ref double totalExpenses, ref double income, ref double loanAmount)
 {
-    Console.Write("What age are you starting to save? ");
+    Console.Write("What age are you starting your savings? ");
     int startAge = int.Parse(Console.ReadLine());
     Console.Write("What age would you like to stop saving? ");
     int endAge = int.Parse(Console.ReadLine());
@@ -194,13 +210,13 @@ static void SavingsProjection(ref double totalExpenses, ref double income, ref d
 
     double totalSaved = income * 0.20 * 12 * years;
     Console.WriteLine($"If you save 20% of your income annually for {years} years...");
-    Console.WriteLine($"You could have saved: ${totalSaved} by age {endAge}.");
+    Console.WriteLine($"You could save: ${totalSaved} by age {endAge}.");
 
-    Thread.Sleep(2500);
+    Thread.Sleep(5000);
     RerouteMenu(ref totalExpenses, ref income, ref loanAmount);
 }
 //**************** SAVING BUDGET *******************//
-static void SaveBudget(string[] labels, double[] amounts, int count, double income, string payPeriod)
+static void SaveBudget(ref double totalExpenses, ref double loanAmount,ref string[] labels,ref double[] amounts,ref int count,ref double income,ref string payPeriod)
 {
     using (StreamWriter writer = new StreamWriter("budget.txt"))
     {
@@ -213,9 +229,12 @@ static void SaveBudget(string[] labels, double[] amounts, int count, double inco
         }
     }
     Console.WriteLine("✅ Budget saved to 'budget.txt'.");
-    Thread.Sleep(1500);
+    Thread.Sleep(4000);
+    LoadBudget(ref totalExpenses, ref loanAmount,ref labels, ref amounts, ref count, ref income, ref payPeriod);
+
 }
-static void LoadBudget(ref string[] labels, ref double[] amounts, ref int count, ref double income, ref string payPeriod)
+
+static void LoadBudget(ref double totalExpenses, ref double loanAmount, ref string[] labels, ref double[] amounts, ref int count, ref double income, ref string payPeriod)
 {
     if (!File.Exists("budget.txt"))
     {
@@ -238,17 +257,21 @@ static void LoadBudget(ref string[] labels, ref double[] amounts, ref int count,
     }
 
     Console.WriteLine("✅ Budget loaded from file.");
-    Thread.Sleep(1500);
+    Thread.Sleep(4000);
+    RerouteMenu(ref totalExpenses, ref income, ref loanAmount);
 }
 
 //************************* RETIREMENT PLANNING******************/
 static void RetirementPlanning(ref double totalExpenses, ref double income, ref double loanAmount)
 {
-    Console.Write("Average monthly spending (include leisure): $");
+    System.Console.WriteLine($"You spend {totalExpenses} in monthly expenses.");
+    Console.Write("What is your average monthly spending for leisure: $");
     double monthly = double.Parse(Console.ReadLine());
-    double needed = monthly * 12 * 25;
-    Console.WriteLine($"To retire, you should aim for: ${needed:N2} saved.");
-    Thread.Sleep(2500);
+    double total = totalExpenses + monthly;
+    double needed = total * 12 * 25;
+    Console.WriteLine($"To retire, you should aim for: ${needed} saved.");
+    System.Console.WriteLine("You will have enough money to cover your monthly expenses for a total of 25 years after you retire.");
+    Thread.Sleep(5000);
     RerouteMenu(ref totalExpenses, ref income, ref loanAmount);
 }
 
@@ -256,7 +279,7 @@ static void RetirementPlanning(ref double totalExpenses, ref double income, ref 
 static void InvestmentAdvice(ref double totalExpenses, ref double income, ref double loanAmount)
 {
     string filePath = "market_data.txt";
-    List<double> rates = new List<double>();
+    List<double> rates = new List<double>();    
     double averageRate = 0;
 
     try
@@ -265,10 +288,12 @@ static void InvestmentAdvice(ref double totalExpenses, ref double income, ref do
         foreach (string line in lines)
         {
             if (line.StartsWith("Year")) continue; // Skip header
-            string[] parts = line.Split(',');
+            string[] parts = line.Split('#');
             if (parts.Length == 2 && double.TryParse(parts[1], out double rate))
             {
                 rates.Add(rate);
+                System.Console.WriteLine(rate);
+
             }
         }
 
@@ -283,7 +308,7 @@ static void InvestmentAdvice(ref double totalExpenses, ref double income, ref do
         }
     }
     catch (Exception ex)
-    {
+     {
         Console.WriteLine($"⚠️ Error reading market data: {ex.Message}");
         Console.WriteLine("Using default 10% projection rate.");
         averageRate = 0.10;
@@ -295,7 +320,7 @@ static void InvestmentAdvice(ref double totalExpenses, ref double income, ref do
     double monthlyInvestment = double.Parse(Console.ReadLine());
 
     Console.Write("How many years do you want to invest for? ");
-    int years = int.Parse(Console.ReadLine());
+    double years = double.Parse(Console.ReadLine());
 
     double futureValue = 0;
     for (int i = 1; i <= years * 12; i++)
@@ -306,7 +331,7 @@ static void InvestmentAdvice(ref double totalExpenses, ref double income, ref do
     Console.WriteLine($"\n📈 If you invest ${monthlyInvestment}/month for {years} years at an average annual return of {averageRate * 100}%:");
     Console.WriteLine($"💰 Your investments could grow to about: ${futureValue}\n");
 
-    Thread.Sleep(2500);
+    Thread.Sleep(5000);
     RerouteMenu(ref totalExpenses, ref income, ref loanAmount);
 }
 
@@ -319,7 +344,7 @@ static void SavingsGoalPlanning(ref double totalExpenses, ref double income, ref
     string goal = Console.ReadLine();
     Console.Write("Goal amount: $");
     double amount = double.Parse(Console.ReadLine());
-    Console.Write("In how many months? ");
+    Console.Write("How many months do you plan to save for? ");
     int months = int.Parse(Console.ReadLine());
 
     double surplus = income - totalExpenses;
@@ -331,36 +356,40 @@ static void SavingsGoalPlanning(ref double totalExpenses, ref double income, ref
     }
     else
     {
-        Console.WriteLine($"✅ Save ${monthly:F2}/month to reach your goal.");
+        Console.WriteLine($"✅ Save ${monthly}/month to reach your goal.");
     }
 
-    Thread.Sleep(2500);
+    Thread.Sleep(5000);
     RerouteMenu(ref totalExpenses, ref income, ref loanAmount);
 }
 
 // LOAN ELIGIBILITY
 static void AnalyzeLoanEligibility(ref double totalExpenses, ref double loanAmount, ref double income)
 {
-    Console.Write("Credit score: ");
-    int credit = int.Parse(Console.ReadLine());
+    Console.Write("What is your Credit score: ");
+    double credit = double.Parse(Console.ReadLine());
     Console.Write("Annual income: $");
     double annual = double.Parse(Console.ReadLine());
-    Console.Write("Interest rate (percent): ");
+    Console.Write("Interest rate (enter a whole number to calculate the percent): ");
     double rate = double.Parse(Console.ReadLine()) / 100;
 
-    Console.Write("Loan amount: $");
+    Console.Write("What is your desired loan amount: $");
     loanAmount = double.Parse(Console.ReadLine());
 
     double monthly = (loanAmount * (rate / 12)) / (1 - Math.Pow(1 + (rate / 12), -60));
     double maxPayment = (income - totalExpenses) * 0.4;
 
-    Console.WriteLine($"Estimated monthly payment: ${monthly:F2}");
-    if (credit >= 650 && annual >= 25000 && monthly <= maxPayment)
-        Console.WriteLine("✅ You may be eligible for a loan.");
-    else
+    Console.Write($"Estimated monthly payment: ${monthly}");
+    if (credit >= 650 && annual >= 25000 && monthly <= maxPayment){
+        Console.Clear();
+        System.Console.WriteLine("✅ You may be eligible for a loan.");
+    }
+    else{
+        Console.Clear();
         Console.WriteLine("❌ Loan approval may be difficult. Consider improving your score or income.");
+        }
 
-    Thread.Sleep(2500);
+    Thread.Sleep(5000);
     RerouteMenu(ref totalExpenses, ref income, ref loanAmount);
 }
 
@@ -368,48 +397,43 @@ static void AnalyzeLoanEligibility(ref double totalExpenses, ref double loanAmou
 
 static void RerouteMenu(ref double totalExpenses, ref double income, ref double loanAmount){
 Console.Clear();
-    System.Console.WriteLine("Would you like to \n1.) Monitor your savings projection,\n2.) start retirement planning,\n3.)get investment advice,\n4.) start savings goal planning, \n5.) consider getting a loan?,\n6.) to return to the Main Menu and start all over again, \n 7 to exit.");
+    System.Console.WriteLine("Would you like to \n1.) Monitor your savings projection.\n2.) Start retirement planning.\n3.) Get investment advice.\n4.) Start savings goal planning. \n5.) Consider getting a loan?\n6.) To return to the Main Menu and start all over again.");
             int reroute = int.Parse(Console.ReadLine());
             switch(reroute){
         case 1:
             Console.WriteLine("Redirecting to Savings Projection...");
-            Thread.Sleep(1500);
+            Thread.Sleep(2500);
+            Console.Clear();
             SavingsProjection(ref totalExpenses, ref income, ref loanAmount);
             break;
         case 2:
             Console.WriteLine("Redirecting to Retirement Planning...");
-            Thread.Sleep(1500);
+            Thread.Sleep(2500);
+            Console.Clear();
             RetirementPlanning(ref totalExpenses, ref income, ref loanAmount);
             break;
         case 3:
             Console.WriteLine("Redirecting to Investment Advice...");
-            Thread.Sleep(1500);
+            Thread.Sleep(2500);
+            Console.Clear();
             InvestmentAdvice(ref totalExpenses, ref income, ref loanAmount);
             break;
         case 4:
             Console.WriteLine("Redirecting to Savings Goal Setup...");
-            Thread.Sleep(1500);
+            Thread.Sleep(2500);
+            Console.Clear();
             SavingsGoalPlanning(ref totalExpenses, ref income, ref loanAmount);
             break;
         case 5:
-            try{
-            System.Console.WriteLine("How much would you like to take out for your loan?");
-            loanAmount = double.Parse(Console.ReadLine());
-            
-            if (loanAmount <= 0)
-                throw new Exception("❌ Invalid amount! Must be a positive whole number.");
-            }
-            catch (Exception ex)
-            {
-            Console.WriteLine(ex.Message);
-            }
             Console.WriteLine("Redirecting to Loan Eligibility...");
-            Thread.Sleep(1500);
+            Thread.Sleep(2500);
+            Console.Clear();
             AnalyzeLoanEligibility(ref totalExpenses, ref loanAmount, ref income);
             break;
         case 6:
             Console.WriteLine("Redirecting to Main Menu...");
-            Thread.Sleep(1500);
+            Thread.Sleep(2500);
+            Console.Clear();
             DisplayMenu();
             break;
         default:
